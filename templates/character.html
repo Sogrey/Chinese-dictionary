@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+
+{% block title %}{{ character.zi }} - 汉字详情 - 汉语字典{% endblock %}
+
+{% block content %}
+<!-- Character Header -->
+<div class="character-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <div class="character-display-large">
+                <div class="character-pinyin-above-large">{{ character.pinyin }}</div>
+                <span class="character-zi-large">{{ character.zi }}</span>
+            </div>
+        </div>
+        <div class="col">
+            <h1 class="character-title">
+                {{ character.zi }}
+                <small class="text-muted">({{ character.unicode }})</small>
+            </h1>
+            <div class="character-meta-large">
+                <span class="badge bg-primary fs-6 me-2" style="cursor: pointer;" title="点击播放拼音">
+                    <i class="fas fa-volume-up"></i> {{ character.pinyin }}
+                </span>
+                <span class="badge bg-success fs-6 me-2">
+                    <i class="fas fa-puzzle-piece"></i> {{ character.bushou }}部 {{ character.bushoubh }}画
+                </span>
+                <span class="badge bg-info fs-6 me-2">
+                    <i class="fas fa-edit"></i> 总{{ character.zbh }}画
+                </span>
+                {% if character.wb86 %}
+                <span class="badge bg-warning text-dark fs-6 me-2">
+                    <i class="fas fa-keyboard"></i> 五笔86: {{ character.wb86 }}
+                </span>
+                {% endif %}
+                {% if character.wb98 and character.wb98 != character.wb86 %}
+                <span class="badge bg-warning text-dark fs-6 me-2">
+                    <i class="fas fa-keyboard"></i> 五笔98: {{ character.wb98 }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-auto">
+            <button onclick="history.back()" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> 返回
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Character Details -->
+<div class="row">
+    <!-- Main Information -->
+    <div class="col-lg-8">
+        <!-- Basic Explanation -->
+        {% if character.jbjs %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle text-primary"></i> 基本解释
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="character-explanation">{{ character.jbjs }}</p>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Detailed Explanations -->
+        <div class="accordion" id="explanationAccordion">
+            <!-- Xinhua Dictionary -->
+            {% if character.xhzdxxjs %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="xinhauaHeader">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#xinhuaContent">
+                        <i class="fas fa-book text-primary me-2"></i>
+                        新华字典详细解释
+                    </button>
+                </h2>
+                <div id="xinhuaContent" class="accordion-collapse collapse" data-bs-parent="#explanationAccordion">
+                    <div class="accordion-body">
+                        <div class="dictionary-content">{{ character.xhzdxxjs }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Chinese Dictionary -->
+            {% if character.hydzdjs %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="chineseDictHeader">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#chineseDictContent">
+                        <i class="fas fa-book-open text-success me-2"></i>
+                        汉语大字典解释
+                    </button>
+                </h2>
+                <div id="chineseDictContent" class="accordion-collapse collapse" data-bs-parent="#explanationAccordion">
+                    <div class="accordion-body">
+                        <div class="dictionary-content">{{ character.hydzdjs }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Kangxi Dictionary -->
+            {% if character.kxzdjs %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="kangxiHeader">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#kangxiContent">
+                        <i class="fas fa-crown text-warning me-2"></i>
+                        康熙字典解释
+                    </button>
+                </h2>
+                <div id="kangxiContent" class="accordion-collapse collapse" data-bs-parent="#explanationAccordion">
+                    <div class="accordion-body">
+                        <div class="dictionary-content ancient-text">{{ character.kxzdjs }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Shuowen Jiezi -->
+            {% if character.swjzxj %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="shuowenHeader">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#shuowenContent">
+                        <i class="fas fa-scroll text-info me-2"></i>
+                        说文解字详解
+                    </button>
+                </h2>
+                <div id="shuowenContent" class="accordion-collapse collapse" data-bs-parent="#explanationAccordion">
+                    <div class="accordion-body">
+                        <div class="dictionary-content ancient-text">{{ character.swjzxj }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Related Information -->
+        <div class="row mt-4">
+            {% if character.xgcy %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-tags text-primary"></i> 相关词语
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="related-words">
+                            {{ character.xgcy|replace('·', ' · ') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if character.xgchengyu %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-gem text-success"></i> 相关成语
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="related-idioms">
+                            {{ character.xgchengyu|replace('·', ' · ') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if character.xgsc %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-feather-alt text-info"></i> 相关诗词
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="related-poetry">
+                    {{ character.xgsc|replace('·', ' · ') }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar Information -->
+    <div class="col-lg-4">
+        <!-- Character Properties -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cog text-primary"></i> 字符属性
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td><strong>汉字</strong></td>
+                            <td class="character-cell">{{ character.zi }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>拼音</strong></td>
+                            <td>{{ character.pinyin }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>部首</strong></td>
+                            <td>
+                                <a href="{{ url_for('search', q=character.bushou, type='bushou') }}" 
+                                   class="text-decoration-none">{{ character.bushou }}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>部首笔画</strong></td>
+                            <td>{{ character.bushoubh }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>总笔画</strong></td>
+                            <td>{{ character.zbh }}</td>
+                        </tr>
+                        {% if character.kxzdbh %}
+                        <tr>
+                            <td><strong>康熙笔画</strong></td>
+                            <td>{{ character.kxzdbh }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td><strong>Unicode</strong></td>
+                            <td><code>{{ character.unicode }}</code></td>
+                        </tr>
+                        {% if character.wb86 %}
+                        <tr>
+                            <td><strong>五笔86</strong></td>
+                            <td><code>{{ character.wb86 }}</code></td>
+                        </tr>
+                        {% endif %}
+                        {% if character.wb98 %}
+                        <tr>
+                            <td><strong>五笔98</strong></td>
+                            <td><code>{{ character.wb98 }}</code></td>
+                        </tr>
+                        {% endif %}
+                        {% if character.hzwx %}
+                        <tr>
+                            <td><strong>五行</strong></td>
+                            <td>{{ character.hzwx }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if character.jxyy %}
+                        <tr>
+                            <td><strong>吉凶寓意</strong></td>
+                            <td>{{ character.jxyy }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td><strong>常用字</strong></td>
+                            <td>
+                                {% if character.cyz == '是' %}
+                                <span class="badge bg-success">是</span>
+                                {% else %}
+                                <span class="badge bg-secondary">否</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if character.xmx %}
+                        <tr>
+                            <td><strong>姓名学</strong></td>
+                            <td>{{ character.xmx }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Stroke Order -->
+        {% if character.bsdx %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-pencil-alt text-warning"></i> 笔顺读写
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="stroke-order">
+                    {{ character.bsdx }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Images -->
+        {% if character.zyybpic_list or character.xgsf_list or character.kxzdpic_list %}
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-images text-info"></i> 相关图片
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if character.zyybpic_list %}
+                <div class="mb-3">
+                    <strong>字源演变：</strong>
+                    <div class="image-gallery mt-2">
+                        {% for img_path in character.zyybpic_list %}
+                        <div class="image-item">
+                            <img src="{{ img_path }}" alt="字源演变" class="character-image" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="image-placeholder" style="display: none;">{{ img_path.split('/')[-1] }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if character.xgsf_list %}
+                <div class="mb-3">
+                    <strong>相关书法：</strong>
+                    <div class="image-gallery mt-2">
+                        {% for img_path in character.xgsf_list %}
+                        <div class="image-item">
+                            <img src="{{ img_path }}" alt="相关书法" class="character-image" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="image-placeholder" style="display: none;">{{ img_path.split('/')[-1] }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if character.kxzdpic_list %}
+                <div>
+                    <strong>康熙字典原图：</strong>
+                    <div class="image-gallery mt-2">
+                        {% for img_path in character.kxzdpic_list %}
+                        <div class="image-item">
+                            <img src="{{ img_path }}" alt="康熙字典" class="character-image" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="image-placeholder" style="display: none;">{{ img_path.split('/')[-1] }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Related Characters -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-link text-primary"></i> 相关推荐
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <strong>同部首字符：</strong>
+                <a href="{{ url_for('search', q=character.bushou, type='bushou') }}" 
+                   class="btn btn-sm btn-outline-primary">
+                    查看{{ character.bushou }}部字符
+                </a>
+            </div>
+            <div class="col-md-3">
+                <strong>同拼音字符：</strong>
+                <a href="{{ url_for('search', q=character.pinyin, type='pinyin') }}" 
+                   class="btn btn-sm btn-outline-success">
+                    查看{{ character.pinyin }}拼音
+                </a>
+            </div>
+            <div class="col-md-3">
+                <strong>同笔画字符：</strong>
+                <a href="{{ url_for('search', q=character.zbh) }}" 
+                   class="btn btn-sm btn-outline-info">
+                    查看{{ character.zbh }}画字符
+                </a>
+            </div>
+            {% if character.wb86 %}
+            <div class="col-md-3">
+                <strong>同五笔字符：</strong>
+                <a href="{{ url_for('search', q=character.wb86, type='wubi') }}" 
+                   class="btn btn-sm btn-outline-warning">
+                    查看{{ character.wb86 }}五笔
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Auto-expand first accordion item if available
+document.addEventListener('DOMContentLoaded', function() {
+    const firstAccordionButton = document.querySelector('#explanationAccordion .accordion-button');
+    if (firstAccordionButton) {
+        firstAccordionButton.click();
+    }
+    
+    // Add click handlers for character images
+    const characterImages = document.querySelectorAll('.character-image');
+    characterImages.forEach(img => {
+        img.addEventListener('click', function() {
+            openImageModal(this.src, this.alt);
+        });
+    });
+});
+
+// Copy character to clipboard
+function copyCharacter() {
+    const character = '{{ character.zi }}';
+    navigator.clipboard.writeText(character).then(function() {
+        // Show success message
+        const toast = new bootstrap.Toast(document.createElement('div'));
+        // Could implement toast notification here
+    });
+}
+
+// Open image in modal for better viewing
+function openImageModal(src, alt) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('imageModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'imageModal';
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">图片查看</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="modalImage" src="" alt="" class="img-fluid" style="max-height: 70vh;">
+                        <p id="modalImageName" class="mt-2 text-muted"></p>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Update modal content
+    document.getElementById('modalImage').src = src;
+    document.getElementById('modalImage').alt = alt;
+    document.getElementById('modalImageName').textContent = src.split('/').pop();
+    
+    // Show modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+}
+</script>
+{% endblock %}

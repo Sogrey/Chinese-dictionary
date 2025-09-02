@@ -1,0 +1,221 @@
+/* Pinyin Table Specific Styles */
+
+.pinyin-table-container {
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pinyin-table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1200px;
+    font-size: 0.9rem;
+    background-color: white;
+}
+
+.pinyin-table th,
+.pinyin-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 60px;
+    height: 45px;
+}
+
+.pinyin-table th {
+    background-color: #5983d0;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.pinyin-table .yunmu-header {
+    background-color: #4a76c7;
+    color: white;
+    font-weight: bold;
+    min-width: 80px;
+    position: sticky;
+    left: 0;
+    z-index: 11;
+}
+
+/* 单韵母 - 绿色系 */
+.simple-vowel {
+    background-color: #8BC34A;
+    color: white;
+}
+
+.simple-vowel .syllable {
+    background-color: #AED581;
+    color: #2E7D32;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.simple-vowel .syllable:hover {
+    background-color: #9CCC65;
+    transform: scale(1.05);
+}
+
+/* 复韵母 - 蓝色系 */
+.compound-vowel {
+    background-color: #2196F3;
+    color: white;
+}
+
+.compound-vowel .syllable {
+    background-color: #90CAF9;
+    color: #1565C0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.compound-vowel .syllable:hover {
+    background-color: #64B5F6;
+    transform: scale(1.05);
+}
+
+/* 前鼻韵母 - 深绿色系 */
+.front-nasal {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.front-nasal .syllable {
+    background-color: #A5D6A7;
+    color: #2E7D32;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.front-nasal .syllable:hover {
+    background-color: #8BC34A;
+    transform: scale(1.05);
+}
+
+/* 后鼻韵母 - 深蓝色系 */
+.back-nasal {
+    background-color: #3F51B5;
+    color: white;
+}
+
+.back-nasal .syllable {
+    background-color: #C5CAE9;
+    color: #283593;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.back-nasal .syllable:hover {
+    background-color: #9FA8DA;
+    transform: scale(1.05);
+}
+
+/* 三拼音节韵母 - 青色系 */
+.triple-spell {
+    background-color: #00BCD4;
+    color: white;
+}
+
+.triple-spell .syllable {
+    background-color: #B2EBF2;
+    color: #006064;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.triple-spell .syllable:hover {
+    background-color: #80DEEA;
+    transform: scale(1.05);
+}
+
+.syllable {
+    display: inline-block;
+    padding: 4px 6px;
+    margin: 1px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    min-width: 35px;
+    text-align: center;
+    position: relative;
+}
+
+.empty-cell {
+    background-color: #f8f9fa;
+}
+
+.tone-selector {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.legend {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.legend-item {
+    display: inline-block;
+    margin: 5px 10px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.speaking {
+    animation: pulse-speaking 0.6s ease-in-out infinite;
+}
+
+@keyframes pulse-speaking {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.header-info {
+    text-align: center;
+    padding: 20px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .pinyin-table {
+        font-size: 0.75rem;
+    }
+    
+    .pinyin-table th,
+    .pinyin-table td {
+        padding: 4px;
+        min-width: 45px;
+        height: 35px;
+    }
+    
+    .syllable {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+        min-width: 25px;
+    }
+    
+    .tone-selector .btn-group {
+        flex-wrap: wrap;
+    }
+    
+    .legend-item {
+        margin: 2px 5px;
+        padding: 3px 6px;
+        font-size: 0.8rem;
+    }
+}

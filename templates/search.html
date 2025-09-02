@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if query %}
+查询结果：{{ query }} - 汉语字典
+{% else %}
+字典查询 - 汉语字典
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Search Header -->
+<div class="search-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h2>
+                <i class="fas fa-search text-primary"></i>
+                {% if query %}
+                    查询结果
+                    {% if results %}
+                        <small class="text-muted">
+                            找到 {{ results.total_count }} 个结果，关键词："{{ query }}"
+                        </small>
+                    {% endif %}
+                {% else %}
+                    字典查询
+                {% endif %}
+            </h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-home"></i> 返回首页
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced Search Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('search') }}" class="advanced-search">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="searchQuery" class="form-label">查询内容</label>
+                    <input type="text" class="form-control" id="searchQuery" name="q" 
+                           value="{{ query }}" placeholder="输入汉字、拼音、五笔码等..." autocomplete="off">
+                </div>
+                <div class="col-md-4">
+                    <label for="searchType" class="form-label">查询类型</label>
+                    <select class="form-select" id="searchType" name="type">
+                        <option value="all" {% if search_type == 'all' %}selected{% endif %}>全部字段</option>
+                        <option value="zi" {% if search_type == 'zi' %}selected{% endif %}>汉字</option>
+                        <option value="pinyin" {% if search_type == 'pinyin' %}selected{% endif %}>拼音</option>
+                        <option value="wubi" {% if search_type == 'wubi' %}selected{% endif %}>五笔 (86/98)</option>
+                        <option value="wb86" {% if search_type == 'wb86' %}selected{% endif %}>五笔86码</option>
+                        <option value="bushou" {% if search_type == 'bushou' %}selected{% endif %}>部首</option>
+                        <option value="zbh" {% if search_type == 'zbh' %}selected{% endif %}>总笔画数</option>
+                        <option value="unicode" {% if search_type == 'unicode' %}selected{% endif %}>Unicode</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> 查询
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if results %}
+    {% if results.results %}
+        <!-- Search Results -->
+        <div class="search-results">
+            <!-- Results Info -->
+            <div class="results-info mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">
+                        显示第 {{ (results.current_page - 1) * results.items_per_page + 1 }} - 
+                        {{ [(results.current_page * results.items_per_page), results.total_count]|min }} 项，
+                        共 {{ results.total_count }} 项结果
+                    </span>
+                    <div class="view-options">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" data-view="grid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Character Grid -->
+            <div class="character-grid" id="resultsContainer">
+                {% for char in results.results %}
+                <div class="character-card card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-auto">
+                                <a href="{{ url_for('character_detail', char_id=char.id) }}" class="character-link" 
+                                   data-bs-toggle="tooltip" data-bs-placement="top" 
+                                   title="点击查看 {{ char.zi }} 的详细信息">
+                                    <div class="character-display">
+                                        <div class="character-pinyin-above">{{ char.pinyin }}</div>
+                                        <span class="character-zi">{{ char.zi }}</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col character-info">
+                                <h5 class="character-title">
+                                    <a href="{{ url_for('character_detail', char_id=char.id) }}" 
+                                       class="text-decoration-none">
+                                        {{ char.zi }}
+                                    </a>
+                                    <small class="text-muted">({{ char.unicode }})</small>
+                                </h5>
+                                
+                                <div class="character-meta mb-2">
+                                    <span class="badge bg-primary me-1" style="cursor: pointer;" title="点击播放拼音">
+                                        <i class="fas fa-volume-up"></i> {{ char.pinyin }}
+                                    </span>
+                                    <a href="{{ url_for('search', q=char.bushou, type='bushou') }}" class="text-decoration-none">
+                                        <span class="badge bg-success me-1">
+                                            <i class="fas fa-puzzle-piece"></i> {{ char.bushou }}部
+                                        </span>
+                                    </a>
+                                    <a href="{{ url_for('search', q=char.zbh, type='zbh') }}" class="text-decoration-none">
+                                        <span class="badge bg-info me-1">
+                                            <i class="fas fa-edit"></i> {{ char.zbh }}画
+                                        </span>
+                                    </a>
+                                    {% if char.wb86 %}
+                                    <a href="{{ url_for('search', q=char.wb86, type='wb86') }}" class="text-decoration-none">
+                                        <span class="badge bg-warning text-dark me-1">
+                                            <i class="fas fa-keyboard"></i> {{ char.wb86 }}
+                                        </span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="character-desc">
+                                    {% if char.jbjs %}
+                                        <p class="mb-1">
+                                            <strong class="text-primary">{{ char.pinyin }}</strong> 
+                                            {{ char.jbjs[:150] }}
+                                            {% if char.jbjs|length > 150 %}...{% endif %}
+                                        </p>
+                                    {% else %}
+                                        <p class="mb-1">
+                                            <strong class="text-primary">{{ char.pinyin }}</strong>
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if results.total_pages > 1 %}
+            <nav aria-label="Search results pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous -->
+                    {% if results.current_page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', q=query, type=search_type, page=results.current_page-1) }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Page Numbers -->
+                    {% set start_page = [1, results.current_page - 2]|max %}
+                    {% set end_page = [results.total_pages, results.current_page + 2]|min %}
+                    
+                    {% if start_page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', q=query, type=search_type, page=1) }}">1</a>
+                    </li>
+                    {% if start_page > 2 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                    
+                    {% for page_num in range(start_page, end_page + 1) %}
+                    <li class="page-item {% if page_num == results.current_page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('search', q=query, type=search_type, page=page_num) }}">
+                            {{ page_num }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if end_page < results.total_pages %}
+                    {% if end_page < results.total_pages - 1 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', q=query, type=search_type, page=results.total_pages) }}">
+                            {{ results.total_pages }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Next -->
+                    {% if results.current_page < results.total_pages %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('search', q=query, type=search_type, page=results.current_page+1) }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- No Results -->
+        <div class="no-results text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-search fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">未找到相关结果</h4>
+            <p class="text-muted mb-4">
+                没有找到与 "{{ query }}" 相关的汉字，请尝试：
+            </p>
+            <ul class="list-unstyled text-muted">
+                <li><i class="fas fa-check text-success"></i> 检查输入是否正确</li>
+                <li><i class="fas fa-check text-success"></i> 尝试使用不同的查询类型</li>
+                <li><i class="fas fa-check text-success"></i> 使用更简短的关键词</li>
+                <li><i class="fas fa-check text-success"></i> 尝试相关的汉字或拼音</li>
+            </ul>
+            <div class="mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> 返回首页
+                </a>
+                <button class="btn btn-outline-secondary" onclick="document.getElementById('searchQuery').focus()">
+                    <i class="fas fa-edit"></i> 修改查询
+                </button>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// View toggle functionality
+document.querySelectorAll('[data-view]').forEach(button => {
+    button.addEventListener('click', function() {
+        const viewType = this.dataset.view;
+        const container = document.getElementById('resultsContainer');
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('[data-view]').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        // Toggle view class
+        if (viewType === 'list') {
+            container.classList.add('list-view');
+        } else {
+            container.classList.remove('list-view');
+        }
+        
+        // Reinitialize tooltips after view change
+        if (typeof bootstrap !== 'undefined') {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+    });
+});
+
+// Auto-focus search input if no results
+{% if not results or not results.results %}
+document.getElementById('searchQuery').focus();
+{% endif %}
+
+// Initialize tooltips for character display elements
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof bootstrap !== 'undefined') {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+});
+</script>
+{% endblock %}

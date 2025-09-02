@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}汉语字典查询系统 - 首页{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center py-5 mb-5">
+    <div class="container">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-book-open text-primary"></i>
+            汉语字典查询系统
+        </h1>
+        <p class="lead mb-4">
+            基于20,880个汉字的综合数据库，提供字形、拼音、五笔、部首、康熙字典、说文解字等详细信息
+        </p>
+        
+        <!-- Main Search Form -->
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <form method="GET" action="{{ url_for('search') }}" class="search-form">
+                    <div class="input-group input-group-lg mb-3">
+                        <input type="text" class="form-control" name="q" id="mainSearch" 
+                               placeholder="输入汉字、拼音、五笔码..." autocomplete="off" autofocus>
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> 查询
+                        </button>
+                    </div>
+                    
+                    <!-- Search Type Options -->
+                    <div class="btn-group mb-3" role="group">
+                        <input type="radio" class="btn-check" name="type" id="type-all" value="all" checked>
+                        <label class="btn btn-outline-primary" for="type-all">
+                            <i class="fas fa-globe"></i> 全部
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="type" id="type-zi" value="zi">
+                        <label class="btn btn-outline-primary" for="type-zi">
+                            <i class="fas fa-font"></i> 汉字
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="type" id="type-pinyin" value="pinyin">
+                        <label class="btn btn-outline-primary" for="type-pinyin">
+                            <i class="fas fa-language"></i> 拼音
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="type" id="type-wubi" value="wubi">
+                        <label class="btn btn-outline-primary" for="type-wubi">
+                            <i class="fas fa-keyboard"></i> 五笔
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="type" id="type-bushou" value="bushou">
+                        <label class="btn btn-outline-primary" for="type-bushou">
+                            <i class="fas fa-puzzle-piece"></i> 部首
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Quick Examples -->
+        <div class="quick-examples">
+            <small>
+                快速示例：
+                <a href="{{ url_for('search', q='中', type='zi') }}" class="text-decoration-none">中</a> ·
+                <a href="{{ url_for('search', q='zhong', type='pinyin') }}" class="text-decoration-none">zhong</a> ·
+                <a href="{{ url_for('search', q='KHK', type='wubi') }}" class="text-decoration-none">KHK</a> ·
+                <a href="{{ url_for('search', q='丨', type='bushou') }}" class="text-decoration-none">丨部</a>
+            </small>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="row mb-5">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar text-primary"></i> 数据库统计
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 col-md-3 text-center mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-primary">{{ "{:,}".format(stats.total_characters) }}</div>
+                            <div class="stat-label">汉字总数</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 text-center mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-success">{{ stats.top_radicals|length }}</div>
+                            <div class="stat-label">部首分类</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 text-center mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-info">27</div>
+                            <div class="stat-label">数据字段</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 text-center mb-3">
+                        <div class="stat-item">
+                            <div class="stat-number text-warning">5</div>
+                            <div class="stat-label">查询方式</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-crown text-warning"></i> 热门部首
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="radical-list">
+                    {% for radical in stats.top_radicals[:5] %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <a href="{{ url_for('search', q=radical.bushou, type='bushou') }}" 
+                           class="text-decoration-none">
+                            <span class="radical">{{ radical.bushou }}</span>
+                        </a>
+                        <span class="badge bg-secondary">{{ radical.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('search', type='bushou') }}" class="btn btn-sm btn-outline-primary">
+                        查看更多部首 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                </div>
+                <h5 class="card-title">多维度查询</h5>
+                <p class="card-text">
+                    支持按汉字、拼音、五笔码、部首、Unicode等多种方式查询，满足不同用户需求。
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-book fa-3x text-success mb-3"></i>
+                </div>
+                <h5 class="card-title">权威资料</h5>
+                <p class="card-text">
+                    整合康熙字典、说文解字、新华字典等权威资料，提供准确详实的字词解释。
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt fa-3x text-info mb-3"></i>
+                </div>
+                <h5 class="card-title">响应式设计</h5>
+                <p class="card-text">
+                    适配桌面端、平板和手机等各种设备，随时随地查询汉字信息。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Auto-focus on search input
+document.getElementById('mainSearch').focus();
+
+// Add search suggestions (could be enhanced with AJAX)
+document.getElementById('mainSearch').addEventListener('input', function() {
+    // Placeholder for future search suggestions functionality
+});
+</script>
+{% endblock %}

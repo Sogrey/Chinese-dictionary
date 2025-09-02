@@ -483,6 +483,29 @@ body {
     background: #e9ecef;
 }
 
+/* New Label Styles for Related Content */
+.word-label, .idiom-label, .poetry-label {
+    display: inline-block;
+    margin: 0.25rem 0.15rem;
+    padding: 0.4rem 0.8rem;
+    background-color: #3498db;
+    color: white;
+    border: 1px solid #3498db;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: default;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.word-label:hover, .idiom-label:hover, .poetry-label:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    opacity: 0.9;
+}
+
 /* Image Gallery */
 .image-gallery {
     display: flex;

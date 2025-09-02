@@ -152,7 +152,12 @@
                     </div>
                     <div class="card-body">
                         <div class="related-words">
-                            {{ character.xgcy|replace('·', ' · ') }}
+                            {% set words = character.xgcy.split('·') %}
+                            {% for word in words %}
+                                {% if word.strip() %}
+                                <span class="word-label">{{ word.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -169,7 +174,12 @@
                     </div>
                     <div class="card-body">
                         <div class="related-idioms">
-                            {{ character.xgchengyu|replace('·', ' · ') }}
+                            {% set idioms = character.xgchengyu.split('·') %}
+                            {% for idiom in idioms %}
+                                {% if idiom.strip() %}
+                                <span class="idiom-label">{{ idiom.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -186,7 +196,12 @@
             </div>
             <div class="card-body">
                 <div class="related-poetry">
-                    {{ character.xgsc|replace('·', ' · ') }}
+                    {% set poems = character.xgsc.split('·') %}
+                    {% for poem in poems %}
+                        {% if poem.strip() %}
+                        <span class="poetry-label">{{ poem.strip() }}</span>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -418,7 +433,27 @@ document.addEventListener('DOMContentLoaded', function() {
             openImageModal(this.src, this.alt);
         });
     });
+    
+    // Apply random colors to labels
+    applyRandomColorsToLabels();
 });
+
+// Function to generate random colors for labels
+function applyRandomColorsToLabels() {
+    const colors = [
+        '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', 
+        '#1abc9c', '#e67e22', '#34495e', '#16a085', '#27ae60',
+        '#2980b9', '#8e44ad', '#d35400', '#c0392b', '#7f8c8d',
+        '#f1c40f', '#e91e63', '#009688', '#673ab7', '#ff5722'
+    ];
+    
+    const labels = document.querySelectorAll('.word-label, .idiom-label, .poetry-label');
+    labels.forEach(label => {
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        label.style.backgroundColor = randomColor;
+        label.style.borderColor = randomColor;
+    });
+}
 
 // Copy character to clipboard
 function copyCharacter() {

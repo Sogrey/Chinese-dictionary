@@ -82,8 +82,8 @@
 
 1. **克隆项目**
    ```bash
-   git clone <repository-url>
-   cd 字典20880条数据
+   git clone https://github.com/Sogrey/Chinese-dictionary.git
+   cd Chinese-dictionary
    ```
 
 2. **安装依赖**
@@ -288,10 +288,11 @@ A:
 
 ## 📞 联系方式
 
-- **项目Issues**: [GitHub Issues](../../issues)
-- **功能建议**: [GitHub Discussions](../../discussions)
+- **项目Issues**: [GitHub Issues](https://github.com/Sogrey/Chinese-dictionary/issues)
+- **功能建议**: [GitHub Discussions](https://github.com/Sogrey/Chinese-dictionary/discussions)
 
 ---
 
-**用 ❤️ 为中文语言教育制作**
+**用 ❤️ 为中文语言教育制作** | [GitHub](https://github.com/Sogrey/Chinese-dictionary) | [Issues](https://github.com/Sogrey/Chinese-dictionary/issues)
+
 **⭐ 如果这个项目对您有帮助，请给我们一个星标！**

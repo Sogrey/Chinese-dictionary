@@ -64,8 +64,9 @@ test_*.py
 *_test.py
 debug_*.py
 
-# Qoder IDE specific
+# IDE and Development Tools
 .qoder/
+.codebuddy/
 
 # Large data files (keep original SQL for reference but may want to exclude if too large)
 # 字典20880条数据.sql

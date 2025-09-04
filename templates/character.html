@@ -8,7 +8,15 @@
     <div class="row align-items-center">
         <div class="col-auto">
             <div class="character-display-large">
-                <div class="character-pinyin-above-large">{{ character.pinyin }}</div>
+                <div class="character-pinyin-above-large">
+                    {% if character.all_pronunciations and character.all_pronunciations|length > 1 %}
+                        {% for pronunciation in character.all_pronunciations %}
+                            <span class="me-1">{{ pronunciation }}</span>
+                        {% endfor %}
+                    {% else %}
+                        {{ character.primary_pronunciation if character.primary_pronunciation else character.pinyin }}
+                    {% endif %}
+                </div>
                 <span class="character-zi-large">{{ character.zi }}</span>
             </div>
         </div>
@@ -18,9 +26,19 @@
                 <small class="text-muted">({{ character.unicode }})</small>
             </h1>
             <div class="character-meta-large">
-                <span class="badge bg-primary fs-6 me-2" style="cursor: pointer;" title="点击播放拼音">
-                    <i class="fas fa-volume-up"></i> {{ character.pinyin }}
-                </span>
+                {% if character.all_pronunciations and character.all_pronunciations|length > 1 %}
+                    {% for pronunciation in character.all_pronunciations %}
+                        <span class="badge bg-primary fs-6 me-1" style="cursor: pointer;" 
+                              onclick="window.ChineseDictionary && window.ChineseDictionary.playPinyin('{{ pronunciation }}')"
+                              title="点击播放 {{ pronunciation }}">
+                            <i class="fas fa-volume-up"></i> {{ pronunciation }}
+                        </span>
+                    {% endfor %}
+                {% else %}
+                    <span class="badge bg-primary fs-6 me-2" style="cursor: pointer;" title="点击播放拼音">
+                        <i class="fas fa-volume-up"></i> {{ character.pinyin }}
+                    </span>
+                {% endif %}
                 <span class="badge bg-success fs-6 me-2">
                     <i class="fas fa-puzzle-piece"></i> {{ character.bushou }}部 {{ character.bushoubh }}画
                 </span>
@@ -52,19 +70,7 @@
     <!-- Main Information -->
     <div class="col-lg-8">
         <!-- Basic Explanation -->
-        {% if character.jbjs %}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-info-circle text-primary"></i> 基本解释
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="character-explanation">{{ character.jbjs }}</p>
-            </div>
-        </div>
-        {% endif %}
-        
+
         <!-- Detailed Explanations -->
         <div class="accordion" id="explanationAccordion">
             <!-- Xinhua Dictionary -->
@@ -226,7 +232,28 @@
                         </tr>
                         <tr>
                             <td><strong>拼音</strong></td>
-                            <td>{{ character.pinyin }}</td>
+                            <td>
+                                {% if character.all_pronunciations and character.all_pronunciations|length > 1 %}
+                                    <!-- 多音字显示所有读音 -->
+                                    <div class="pronunciations-list">
+                                        {% for pronunciation in character.all_pronunciations %}
+                                            <span class="badge bg-primary me-1 pronunciation-badge" style="cursor: pointer;" 
+                                                  onclick="window.ChineseDictionary && window.ChineseDictionary.playPinyin('{{ pronunciation }}')" 
+                                                  title="点击播放 {{ pronunciation }}">
+                                                <i class="fas fa-volume-up"></i> {{ pronunciation }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">该字有{{ character.all_pronunciations|length }}个读音</small>
+                                {% else %}
+                                    <!-- 单音字显示 -->
+                                    <span class="badge bg-primary pronunciation-badge" style="cursor: pointer;" 
+                                          onclick="window.ChineseDictionary && window.ChineseDictionary.playPinyin('{{ character.pinyin }}')" 
+                                          title="点击播放 {{ character.pinyin }}">
+                                        <i class="fas fa-volume-up"></i> {{ character.pinyin }}
+                                    </span>
+                                {% endif %}
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>部首</strong></td>
@@ -299,20 +326,45 @@
         </div>
         
         <!-- Stroke Order -->
-        {% if character.bsdx %}
         <div class="card mb-4">
             <div class="card-header">
                 <h6 class="card-title mb-0">
-                    <i class="fas fa-pencil-alt text-warning"></i> 笔顺读写
+                    <i class="fas fa-pencil-alt text-warning"></i> 笔顺
                 </h6>
             </div>
             <div class="card-body">
-                <div class="stroke-order">
-                    {{ character.bsdx }}
+                <!-- Hanzi Writer Container -->
+                <div id="hanzi-writer-container" class="text-center mb-3">
+                    <div id="hanzi-target" style="width: 200px; height: 200px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;"></div>
+                </div>
+                
+                <!-- Controls -->
+                <div class="stroke-controls text-center mb-3">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" id="animate-btn">
+                            <i class="fas fa-play"></i> 笔顺动画
+                        </button>
+                        <button type="button" class="btn btn-outline-success" id="quiz-btn">
+                            <i class="fas fa-pencil-alt"></i> 书写练习
+                        </button>
+                        <button type="button" class="btn btn-outline-warning" id="reset-btn">
+                            <i class="fas fa-undo"></i> 重置
+                        </button>
+                    </div>
+                </div>
+                
+
+                <!-- Loading state -->
+                <div id="stroke-loading" class="text-center text-muted" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> 正在加载笔顺数据...
+                </div>
+                
+                <!-- Error state -->
+                <div id="stroke-error" class="text-center text-muted" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i> 笔顺数据暂时不可用
                 </div>
             </div>
         </div>
-        {% endif %}
         
         <!-- Images -->
         {% if character.zyybpic_list or character.xgsf_list or character.kxzdpic_list %}
@@ -436,7 +488,100 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Apply random colors to labels
     applyRandomColorsToLabels();
+    
+    // 初始化汉字笔顺组件
+    initializeHanziWriter();
 });
+
+// 初始化汉字笔顺组件
+function initializeHanziWriter() {
+    const character = '{{ character.zi }}';
+    const targetElement = document.getElementById('hanzi-target');
+    const loadingElement = document.getElementById('stroke-loading');
+    const errorElement = document.getElementById('stroke-error');
+    const animateBtn = document.getElementById('animate-btn');
+    const quizBtn = document.getElementById('quiz-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    
+    if (!targetElement || !window.HanziWriter) {
+        console.log('Hanzi Writer 不可用，显示传统笔顺描述');
+        return;
+    }
+    
+    // 显示加载状态
+    loadingElement.style.display = 'block';
+    
+    try {
+        // 创建 HanziWriter 实例
+        const writer = HanziWriter.create(targetElement, character, {
+            width: 200,
+            height: 200,
+            padding: 5,
+            strokeColor: '#333',
+            strokeWidth: 2,
+            showOutline: true,
+            showCharacter: true,
+            delayBetweenStrokes: 300,
+            strokeAnimationSpeed: 1,
+            charDataLoader: function(char) {
+                // 使用 CDN 加载汉字数据
+                return fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/${char}.json`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('汉字数据不可用');
+                        }
+                        return response.json();
+                    });
+            }
+        });
+        
+        // 加载成功后隐藏加载状态
+        writer.loaderPromise = writer.loaderPromise || Promise.resolve();
+        writer.loaderPromise
+            .then(() => {
+                loadingElement.style.display = 'none';
+                
+                // 绑定按钮事件
+                animateBtn.addEventListener('click', () => {
+                    writer.animateCharacter();
+                });
+                
+                quizBtn.addEventListener('click', () => {
+                    writer.quiz({
+                        onMistake: function(strokeData) {
+                            console.log('书写错误:', strokeData);
+                        },
+                        onCorrectStroke: function(strokeData) {
+                            console.log('笔划正确:', strokeData);
+                        },
+                        onComplete: function(summaryData) {
+                            alert('恐喜您！书写完成！');
+                            console.log('书写完成:', summaryData);
+                        }
+                    });
+                });
+                
+                resetBtn.addEventListener('click', () => {
+                    writer.hideCharacter();
+                    writer.showCharacter();
+                    writer.cancelQuiz();
+                });
+                
+                // 保存 writer 实例以便全局访问
+                window.currentHanziWriter = writer;
+            })
+            .catch(error => {
+                console.error('加载汉字数据失败:', error);
+                loadingElement.style.display = 'none';
+                errorElement.style.display = 'block';
+            });
+            
+    } catch (error) {
+        console.error('初始化 Hanzi Writer 失败:', error);
+        loadingElement.style.display = 'none';
+        errorElement.style.display = 'block';
+    }
+}
 
 // Function to generate random colors for labels
 function applyRandomColorsToLabels() {

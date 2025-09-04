@@ -199,6 +199,73 @@ body {
     border-radius: 10px;
 }
 
+/* Multi-pronunciation styles */
+.pronunciations-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pronunciation-badge {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.pronunciation-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.pronunciation-badge:active {
+    transform: scale(0.98);
+}
+
+/* Hanzi Writer Styles */
+#hanzi-writer-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+#hanzi-target {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.stroke-controls {
+    margin-top: 1rem;
+}
+
+.traditional-stroke-order {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #ffc107;
+}
+
+#stroke-loading, #stroke-error {
+    padding: 2rem;
+    font-size: 0.9rem;
+}
+
+#stroke-loading i {
+    color: #007bff;
+    margin-right: 0.5rem;
+}
+
+#stroke-error i {
+    color: #dc3545;
+    margin-right: 0.5rem;
+}
+
 .character-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);

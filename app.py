@@ -99,6 +99,12 @@ def search_characters(query: str, search_type: str = 'zi', page: int = 1) -> Dic
     cursor = conn.execute(sql, params)
     results = [dict(row) for row in cursor.fetchall()]
     
+    # 为每个结果添加多音字处理
+    for result in results:
+        pronunciation_data = parse_pronunciations(result.get('pinyin', ''))
+        result['all_pronunciations'] = pronunciation_data['all_pronunciations']
+        result['primary_pronunciation'] = pronunciation_data['primary_pronunciation']
+    
     # Get total count for pagination
     cursor = conn.execute(count_sql, count_params)
     total_count = cursor.fetchone()['total']
@@ -129,8 +135,66 @@ def get_character_by_id(char_id: int) -> Optional[Dict[str, Any]]:
         character['zyybpic_list'] = parse_image_paths(character.get('zyybpic', ''))
         character['xgsf_list'] = parse_image_paths(character.get('xgsf', ''))
         character['kxzdpic_list'] = parse_image_paths(character.get('kxzdpic', ''))
+        
+        # 解析多音字
+        pronunciation_data = parse_pronunciations(character.get('pinyin', ''))
+        character['all_pronunciations'] = pronunciation_data['all_pronunciations']
+        character['primary_pronunciation'] = pronunciation_data['primary_pronunciation']
+        
         return character
     return None
+
+def parse_pronunciations(pinyin_text: str) -> Dict[str, Any]:
+    """
+    解析拼音字段，提取多个读音
+    
+    Args:
+        pinyin_text: 拼音字段文本
+    
+    Returns:
+        包含所有读音和主要读音的字典
+    """
+    if not pinyin_text:
+        return {'all_pronunciations': [], 'primary_pronunciation': ''}
+    
+    # 清理拼音文本
+    cleaned_text = pinyin_text.strip()
+    
+    # 检查是否包含多个读音（通过空格、全角空格、逗号等分隔）
+    separators = [' ', '　', '\t', ',', '，', '、', ';', '；', '/', '\\']
+    pronunciations = [cleaned_text]  # 默认只有一个读音
+    
+    # 尝试不同的分隔符
+    for sep in separators:
+        if sep in cleaned_text:
+            parts = [part.strip() for part in cleaned_text.split(sep) if part.strip()]
+            if len(parts) > 1:
+                pronunciations = parts
+                break
+    
+    # 过滤掉无效的读音
+    valid_pronunciations = []
+    for p in pronunciations:
+        # 清理每个读音
+        p = p.strip()
+        # 基本验证：长度在1-15之间，包含拼音字符
+        if 1 <= len(p) <= 15:
+            # 检查是否包含拼音字符（字母和声调符号）
+            has_valid_chars = any(c.isalpha() for c in p)
+            if has_valid_chars:
+                valid_pronunciations.append(p)
+    
+    # 如果没有有效读音，返回原始文本
+    if not valid_pronunciations:
+        valid_pronunciations = [cleaned_text]
+    
+    # 主要读音选择：通常第一个是最常用的
+    primary_pronunciation = valid_pronunciations[0] if valid_pronunciations else cleaned_text
+    
+    return {
+        'all_pronunciations': valid_pronunciations,
+        'primary_pronunciation': primary_pronunciation
+    }
 
 def parse_image_paths(image_string: str) -> List[str]:
     """Parse concatenated image paths separated by /Upload/"""

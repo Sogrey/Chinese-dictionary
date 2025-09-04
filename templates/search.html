@@ -104,7 +104,7 @@
                                    data-bs-toggle="tooltip" data-bs-placement="top" 
                                    title="点击查看 {{ char.zi }} 的详细信息">
                                     <div class="character-display">
-                                        <div class="character-pinyin-above">{{ char.pinyin }}</div>
+                                        <div class="character-pinyin-above">{{ char.primary_pronunciation if char.primary_pronunciation else char.pinyin }}</div>
                                         <span class="character-zi">{{ char.zi }}</span>
                                     </div>
                                 </a>
@@ -119,9 +119,24 @@
                                 </h5>
                                 
                                 <div class="character-meta mb-2">
-                                    <span class="badge bg-primary me-1" style="cursor: pointer;" title="点击播放拼音">
-                                        <i class="fas fa-volume-up"></i> {{ char.pinyin }}
-                                    </span>
+                                    {% if char.all_pronunciations and char.all_pronunciations|length > 1 %}
+                                        <!-- 多音字显示所有读音 -->
+                                        {% for pronunciation in char.all_pronunciations %}
+                                            <span class="badge bg-primary me-1" style="cursor: pointer;" 
+                                                  onclick="window.ChineseDictionary && window.ChineseDictionary.playPinyin('{{ pronunciation }}')" 
+                                                  title="点击播放 {{ pronunciation }}">
+                                                <i class="fas fa-volume-up"></i> {{ pronunciation }}
+                                            </span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <!-- 单音字显示 -->
+                                        {% set display_pinyin = char.primary_pronunciation if char.primary_pronunciation else char.pinyin %}
+                                        <span class="badge bg-primary me-1" style="cursor: pointer;" 
+                                              onclick="window.ChineseDictionary && window.ChineseDictionary.playPinyin('{{ display_pinyin }}')" 
+                                              title="点击播放拼音">
+                                            <i class="fas fa-volume-up"></i> {{ display_pinyin }}
+                                        </span>
+                                    {% endif %}
                                     <a href="{{ url_for('search', q=char.bushou, type='bushou') }}" class="text-decoration-none">
                                         <span class="badge bg-success me-1">
                                             <i class="fas fa-puzzle-piece"></i> {{ char.bushou }}部
@@ -142,17 +157,7 @@
                                 </div>
                                 
                                 <div class="character-desc">
-                                    {% if char.jbjs %}
-                                        <p class="mb-1">
-                                            <strong class="text-primary">{{ char.pinyin }}</strong> 
-                                            {{ char.jbjs[:150] }}
-                                            {% if char.jbjs|length > 150 %}...{% endif %}
-                                        </p>
-                                    {% else %}
-                                        <p class="mb-1">
-                                            <strong class="text-primary">{{ char.pinyin }}</strong>
-                                        </p>
-                                    {% endif %}
+
                                 </div>
                             </div>
                         </div>
